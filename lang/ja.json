@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "langName": "日本語"
+  },
+  "header": {
+    "title": "お問い合わせ",
+    "subtitle": "ご意見をお聞かせください"
+  },
+  "form": {
+    "app": {
+      "label": "サービス選択",
+      "placeholder": "選択してください"
+    },
+    "type": {
+      "label": "お問い合わせ種類",
+      "placeholder": "選択してください",
+      "bug": "バグ / エラー報告",
+      "feedback": "ご提案 / フィードバック",
+      "general": "一般的なお問い合わせ"
+    },
+    "email": {
+      "label": "メールアドレス",
+      "placeholder": "your@email.com"
+    },
+    "message": {
+      "label": "内容",
+      "placeholder": "詳しい内容をご記入ください..."
+    },
+    "submit": "送信",
+    "sending": "送信中..."
+  },
+  "toast": {
+    "success": "貴重なご意見ありがとうございます！確認後ご返信いたします。",
+    "error": "送信に失敗しました。もう一度お試しください。"
+  },
+  "validation": {
+    "appRequired": "サービスを選択してください。",
+    "typeRequired": "お問い合わせ種類を選択してください。",
+    "emailRequired": "メールアドレスを入力してください。",
+    "emailInvalid": "正しいメールアドレスを入力してください。",
+    "messageRequired": "内容を入力してください。"
+  }
+}

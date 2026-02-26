@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "langName": "中文"
+  },
+  "header": {
+    "title": "联系我们",
+    "subtitle": "期待您的宝贵意见"
+  },
+  "form": {
+    "app": {
+      "label": "服务选择",
+      "placeholder": "请选择"
+    },
+    "type": {
+      "label": "咨询类型",
+      "placeholder": "请选择",
+      "bug": "Bug / 错误报告",
+      "feedback": "建议 / 反馈",
+      "general": "一般咨询"
+    },
+    "email": {
+      "label": "电子邮箱",
+      "placeholder": "your@email.com"
+    },
+    "message": {
+      "label": "内容",
+      "placeholder": "请详细描述..."
+    },
+    "submit": "发送",
+    "sending": "发送中..."
+  },
+  "toast": {
+    "success": "感谢您的宝贵意见！我们会尽快回复。",
+    "error": "发送失败，请重试。"
+  },
+  "validation": {
+    "appRequired": "请选择服务。",
+    "typeRequired": "请选择咨询类型。",
+    "emailRequired": "请输入电子邮箱。",
+    "emailInvalid": "请输入有效的电子邮箱地址。",
+    "messageRequired": "请输入内容。"
+  }
+}

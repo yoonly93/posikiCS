@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "langName": "English"
+  },
+  "header": {
+    "title": "Contact Us",
+    "subtitle": "We'd love to hear from you"
+  },
+  "form": {
+    "app": {
+      "label": "Service",
+      "placeholder": "Please select"
+    },
+    "type": {
+      "label": "Inquiry Type",
+      "placeholder": "Please select",
+      "bug": "Bug / Error Report",
+      "feedback": "Suggestion / Feedback",
+      "general": "General Inquiry"
+    },
+    "email": {
+      "label": "Email Address",
+      "placeholder": "your@email.com"
+    },
+    "message": {
+      "label": "Message",
+      "placeholder": "Please describe in detail..."
+    },
+    "submit": "Send",
+    "sending": "Sending..."
+  },
+  "toast": {
+    "success": "Thank you for your feedback! We'll get back to you soon.",
+    "error": "Failed to send. Please try again."
+  },
+  "validation": {
+    "appRequired": "Please select a service.",
+    "typeRequired": "Please select an inquiry type.",
+    "emailRequired": "Please enter your email.",
+    "emailInvalid": "Please enter a valid email address.",
+    "messageRequired": "Please enter your message."
+  }
+}
