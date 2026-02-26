@@ -333,6 +333,11 @@ const I18n = (() => {
       btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
 
+    const dropdown = document.getElementById('langDropdown');
+    if (dropdown) {
+      dropdown.value = currentLang;
+    }
+
     document.documentElement.lang = currentLang;
   }
 
@@ -356,6 +361,11 @@ const I18n = (() => {
     document.querySelectorAll('.lang-btn').forEach(btn => {
       btn.addEventListener('click', () => switchLanguage(btn.dataset.lang));
     });
+
+    const dropdown = document.getElementById('langDropdown');
+    if (dropdown) {
+      dropdown.addEventListener('change', (e) => switchLanguage(e.target.value));
+    }
   }
 
   return { init, t, switchLanguage };
