@@ -11,17 +11,26 @@ const FirebaseService = (() => {
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+  console.log('[Firebase] initialized, projectId:', firebaseConfig.projectId);
 
   async function saveContact({ service, type, email, message, language }) {
-    return db.collection('contacts').add({
-      service,
-      type,
-      email,
-      message,
-      language,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      isRead: false
-    });
+    console.log('[Firebase] saving contact...', { service, type, email });
+    try {
+      const docRef = await db.collection('contacts').add({
+        service,
+        type,
+        email,
+        message,
+        language,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        isRead: false
+      });
+      console.log('[Firebase] saved! docId:', docRef.id);
+      return docRef;
+    } catch (err) {
+      console.error('[Firebase] save FAILED:', err);
+      throw err;
+    }
   }
 
   return { saveContact };
