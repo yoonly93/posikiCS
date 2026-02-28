@@ -13,7 +13,7 @@
     },
     {
       "target": "admin",
-      "public": "../nanokit/out",
+      "public": "admin-out",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
