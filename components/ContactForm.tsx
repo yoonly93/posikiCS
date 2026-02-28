@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, FormEvent } from 'react';
+import { useState, useRef, useEffect, FormEvent } from 'react';
 import { sendEmail } from '@/lib/emailService';
 import { saveContact } from '@/lib/firestore';
+import { getAppList, type AppInfo } from '@/lib/appService';
 import { showToast } from './Toast';
 
 interface ContactFormProps {
@@ -13,8 +14,16 @@ interface ContactFormProps {
 export default function ContactForm({ t, lang }: ContactFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [apps, setApps] = useState<AppInfo[]>([]);
+  const [appsLoading, setAppsLoading] = useState(true);
   const formRef = useRef<HTMLFormElement>(null);
   const honeypotRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    getAppList()
+      .then(setApps)
+      .finally(() => setAppsLoading(false));
+  }, []);
 
   function clearError(field: string) {
     setErrors((prev) => {
@@ -104,11 +113,11 @@ export default function ContactForm({ t, lang }: ContactFormProps) {
       {/* Service/App */}
       <div className={`form-group${errors.app ? ' has-error' : ''}`}>
         <label htmlFor="appName">{t('form.app.label')}</label>
-        <select id="appName" name="app" required onChange={() => clearError('app')}>
-          <option value="">{t('form.app.placeholder')}</option>
-          <option value="Eyeday">Eyeday</option>
-          <option value="Ceremoney">Ceremoney</option>
-          <option value="Proper">Proper</option>
+        <select id="appName" name="app" required onChange={() => clearError('app')} disabled={appsLoading}>
+          <option value="">{appsLoading ? '...' : t('form.app.placeholder')}</option>
+          {apps.map((app) => (
+            <option key={app.id} value={app.name}>{app.name}</option>
+          ))}
         </select>
         <span className="error-msg">{errors.app || ''}</span>
       </div>

@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "nanokit-fba56"
+  },
+  "targets": {
+    "nanokit-fba56": {
+      "hosting": {
+        "admin": ["nanokit-fba56"],
+        "public": ["posikics"]
+      }
+    }
   }
 }
