@@ -13,14 +13,32 @@ const FirebaseService = (() => {
   const db = firebase.firestore();
   console.log('[Firebase] initialized, projectId:', firebaseConfig.projectId);
 
+  async function translateToKo(text, fromLang) {
+    if (fromLang === 'ko' || !text) return text || '';
+    try {
+      const url = 'https://api.mymemory.translated.net/get?q='
+        + encodeURIComponent(text)
+        + '&langpair=' + fromLang + '|ko';
+      const res = await fetch(url);
+      const data = await res.json();
+      const translated = data?.responseData?.translatedText;
+      if (translated && translated !== text) return translated;
+      return '(자동 번역 실패 - 원문 확인)';
+    } catch (e) {
+      return '(자동 번역 실패 - 원문 확인)';
+    }
+  }
+
   async function saveContact({ service, type, email, message, language }) {
     console.log('[Firebase] saving contact...', { service, type, email });
     try {
+      const messageKo = await translateToKo(message, language);
       const docRef = await db.collection('contacts').add({
         service,
         type,
         email,
         message,
+        messageKo,
         language,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         isRead: false
