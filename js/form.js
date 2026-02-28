@@ -100,22 +100,33 @@
     const selectedOption = typeSelect.options[typeSelect.selectedIndex];
     const typeText = selectedOption.textContent;
 
+    const formData = {
+      app: appSelect.value,
+      type: typeText,
+      typeValue: typeSelect.value,
+      email: emailInput.value.trim(),
+      message: messageInput.value.trim(),
+      source: getURLParam('source'),
+      language: document.documentElement.lang
+    };
+
     try {
-      await EmailService.send({
-        app: appSelect.value,
-        type: typeText,
-        typeValue: typeSelect.value,
-        email: emailInput.value.trim(),
-        message: messageInput.value.trim(),
-        source: getURLParam('source'),
-        language: document.documentElement.lang
-      });
+      await Promise.all([
+        EmailService.send(formData),
+        FirebaseService.saveContact({
+          service: formData.app,
+          type: formData.typeValue,
+          email: formData.email,
+          message: formData.message,
+          language: formData.language
+        })
+      ]);
 
       showToast('success', 'toast.success');
       form.reset();
       clearErrors();
     } catch (err) {
-      console.error('Email send failed:', err);
+      console.error('Submit failed:', err);
       showToast('error', 'toast.error');
     } finally {
       setLoading(false);
