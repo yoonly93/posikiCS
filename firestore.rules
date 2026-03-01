@@ -16,6 +16,13 @@ service cloud.firestore {
                                   && request.auth.token.email == 'wildkindground@gmail.com';
     }
 
+    // contactForms: 공개 읽기, 어드민만 쓰기
+    match /contactForms/{formId} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.auth.token.email == 'wildkindground@gmail.com';
+    }
+
     // legal: 공개 읽기, 어드민만 쓰기
     match /legal/{document=**} {
       allow read: if true;

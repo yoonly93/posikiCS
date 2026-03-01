@@ -6,12 +6,17 @@ import { saveContact } from '@/lib/firestore';
 import { getAppList, type AppInfo } from '@/lib/appService';
 import { showToast } from './Toast';
 
+const ALL_TYPES = ['bug', 'feedback', 'general'] as const;
+
 interface ContactFormProps {
   t: (key: string) => string;
   lang: string;
+  lockedApp?: string | null;
+  allowedAppIds?: string[] | null;
+  allowedTypes?: string[] | null;
 }
 
-export default function ContactForm({ t, lang }: ContactFormProps) {
+export default function ContactForm({ t, lang, lockedApp, allowedAppIds, allowedTypes }: ContactFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [apps, setApps] = useState<AppInfo[]>([]);
@@ -21,9 +26,15 @@ export default function ContactForm({ t, lang }: ContactFormProps) {
 
   useEffect(() => {
     getAppList()
-      .then(setApps)
+      .then((allApps) => {
+        if (allowedAppIds && allowedAppIds.length > 0) {
+          setApps(allApps.filter((a) => allowedAppIds.includes(a.id)));
+        } else {
+          setApps(allApps);
+        }
+      })
       .finally(() => setAppsLoading(false));
-  }, []);
+  }, [allowedAppIds]);
 
   function clearError(field: string) {
     setErrors((prev) => {
@@ -36,7 +47,7 @@ export default function ContactForm({ t, lang }: ContactFormProps) {
   function validate(form: HTMLFormElement): boolean {
     const newErrors: Record<string, string> = {};
 
-    const app = (form.elements.namedItem('app') as HTMLSelectElement).value;
+    const app = (form.elements.namedItem('app') as HTMLInputElement).value;
     const type = (form.elements.namedItem('type') as HTMLSelectElement).value;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
     const message = (form.elements.namedItem('message') as HTMLTextAreaElement).value.trim();
@@ -68,7 +79,7 @@ export default function ContactForm({ t, lang }: ContactFormProps) {
 
     setLoading(true);
 
-    const appSelect = form.elements.namedItem('app') as HTMLSelectElement;
+    const appInput = form.elements.namedItem('app') as HTMLInputElement;
     const typeSelect = form.elements.namedItem('type') as HTMLSelectElement;
     const emailInput = form.elements.namedItem('email') as HTMLInputElement;
     const messageInput = form.elements.namedItem('message') as HTMLTextAreaElement;
@@ -76,7 +87,7 @@ export default function ContactForm({ t, lang }: ContactFormProps) {
     const selectedOption = typeSelect.options[typeSelect.selectedIndex];
 
     const formData = {
-      app: appSelect.value,
+      app: appInput.value,
       type: selectedOption.textContent || '',
       typeValue: typeSelect.value,
       email: emailInput.value.trim(),
@@ -113,12 +124,19 @@ export default function ContactForm({ t, lang }: ContactFormProps) {
       {/* Service/App */}
       <div className={`form-group${errors.app ? ' has-error' : ''}`}>
         <label htmlFor="appName">{t('form.app.label')}</label>
-        <select id="appName" name="app" required onChange={() => clearError('app')} disabled={appsLoading}>
-          <option value="">{appsLoading ? '...' : t('form.app.placeholder')}</option>
-          {apps.map((app) => (
-            <option key={app.id} value={app.name}>{app.name}</option>
-          ))}
-        </select>
+        <input
+          type="text"
+          id="appName"
+          name="app"
+          readOnly
+          value={
+            appsLoading
+              ? '...'
+              : lockedApp
+                ? (apps.find((a) => a.id === lockedApp)?.name || lockedApp)
+                : (apps[0]?.name || '')
+          }
+        />
         <span className="error-msg">{errors.app || ''}</span>
       </div>
 
@@ -127,9 +145,12 @@ export default function ContactForm({ t, lang }: ContactFormProps) {
         <label htmlFor="inquiryType">{t('form.type.label')}</label>
         <select id="inquiryType" name="type" required onChange={() => clearError('type')}>
           <option value="">{t('form.type.placeholder')}</option>
-          <option value="bug">{t('form.type.bug')}</option>
-          <option value="feedback">{t('form.type.feedback')}</option>
-          <option value="general">{t('form.type.general')}</option>
+          {(allowedTypes && allowedTypes.length > 0
+            ? ALL_TYPES.filter((key) => allowedTypes.includes(key))
+            : ALL_TYPES
+          ).map((key) => (
+            <option key={key} value={key}>{t(`form.type.${key}`)}</option>
+          ))}
         </select>
         <span className="error-msg">{errors.type || ''}</span>
       </div>
