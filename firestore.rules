@@ -2,38 +2,48 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // apps: 공개 읽기, 어드민만 쓰기
-    match /apps/{appId} {
+    // 유저 프로필
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth != null && request.auth.uid == uid
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status']);
+
+      // 앱: 공개 읽기, 본인만 쓰기
+      match /apps/{appId} {
+        allow read: if true;
+        allow write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      // 문의 폼: 공개 읽기, 본인만 쓰기
+      match /contactForms/{formId} {
+        allow read: if true;
+        allow write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      // 문의: 공개 생성, 본인만 읽기/수정/삭제
+      match /contacts/{contactId} {
+        allow create: if true;
+        allow read, update, delete: if request.auth != null && request.auth.uid == uid;
+      }
+
+      // 법적 문서: 공개 읽기, 본인만 쓰기
+      match /legal/{appId}/{docType}/{lang} {
+        allow read: if true;
+        allow write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      // 설정: 본인만
+      match /settings/{settingId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // 공개 폼 인덱스: 공개 읽기, 본인 소유만 쓰기
+    match /formIndex/{formId} {
       allow read: if true;
-      allow write: if request.auth != null
-                   && request.auth.token.email == 'wildkindground@gmail.com';
-    }
-
-    // contacts: 공개 생성만, 어드민만 읽기/수정/삭제
-    match /contacts/{contactId} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null
-                                  && request.auth.token.email == 'wildkindground@gmail.com';
-    }
-
-    // contactForms: 공개 읽기, 어드민만 쓰기
-    match /contactForms/{formId} {
-      allow read: if true;
-      allow write: if request.auth != null
-                   && request.auth.token.email == 'wildkindground@gmail.com';
-    }
-
-    // legal: 공개 읽기, 어드민만 쓰기
-    match /legal/{document=**} {
-      allow read: if true;
-      allow write: if request.auth != null
-                   && request.auth.token.email == 'wildkindground@gmail.com';
-    }
-
-    // settings: 어드민만
-    match /settings/{settingId} {
-      allow read, write: if request.auth != null
-                         && request.auth.token.email == 'wildkindground@gmail.com';
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
   }
 }

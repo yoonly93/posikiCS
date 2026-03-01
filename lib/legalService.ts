@@ -30,20 +30,22 @@ export interface LegalDoc {
 // ── 읽기 전용 함수 ──
 
 export async function getLegalDoc(
+  uid: string,
   appId: string,
   docType: string,
   lang: string,
 ): Promise<LegalDoc | null> {
-  const snap = await getDoc(doc(db, 'legal', appId, docType, lang));
+  const snap = await getDoc(doc(db, 'users', uid, 'legal', appId, docType, lang));
   if (!snap.exists()) return null;
   return snap.data() as LegalDoc;
 }
 
 export async function getPublishedLangs(
+  uid: string,
   appId: string,
   docType: string,
 ): Promise<string[]> {
-  const snap = await getDocs(collection(db, 'legal', appId, docType));
+  const snap = await getDocs(collection(db, 'users', uid, 'legal', appId, docType));
   return snap.docs
     .filter((d) => {
       const data = d.data() as LegalDoc;
@@ -52,8 +54,8 @@ export async function getPublishedLangs(
     .map((d) => d.id);
 }
 
-export async function getAppName(appId: string): Promise<string | null> {
-  const snap = await getDoc(doc(db, 'apps', appId));
+export async function getAppName(uid: string, appId: string): Promise<string | null> {
+  const snap = await getDoc(doc(db, 'users', uid, 'apps', appId));
   if (!snap.exists()) return null;
   return (snap.data().name as string) || null;
 }

@@ -5,7 +5,7 @@ import { useI18n } from '@/hooks/useI18n';
 import LanguageBar from '@/components/LanguageBar';
 import ContactForm from '@/components/ContactForm';
 import ToastContainer from '@/components/Toast';
-import { getFormConfig, type FormConfig } from '@/lib/formConfigService';
+import { resolveForm, type FormConfig } from '@/lib/formConfigService';
 
 function getParam(key: string): string | null {
   if (typeof window === 'undefined') return null;
@@ -19,6 +19,7 @@ export default function HomePage() {
   const [lockedApp, setLockedApp] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
+  const [formUid, setFormUid] = useState<string | null>(null);
   const [formStatus, setFormStatus] = useState<FormStatus>('loading');
 
   useEffect(() => {
@@ -27,16 +28,17 @@ export default function HomePage() {
     const langParam = getParam('lang');
 
     if (formParam) {
-      getFormConfig(formParam).then((config) => {
-        if (!config) {
+      resolveForm(formParam).then((resolved) => {
+        if (!resolved) {
           setFormStatus('notfound');
-        } else if (config.status === 'paused') {
-          const langs = config.languages || [];
+        } else if (resolved.config.status === 'paused') {
+          const langs = resolved.config.languages || [];
           switchLanguage(langs[0] || 'en');
           setFormStatus('paused');
         } else {
-          setFormConfig(config);
-          const langs = config.languages || [];
+          setFormConfig(resolved.config);
+          setFormUid(resolved.uid);
+          const langs = resolved.config.languages || [];
           switchLanguage(langs[0] || 'en');
           setFormStatus('active');
         }
@@ -81,7 +83,7 @@ export default function HomePage() {
   }
 
   // Form config mode: show LanguageBar with allowed languages
-  if (formStatus === 'active' && formConfig) {
+  if (formStatus === 'active' && formConfig && formUid) {
     const allowedLangs = formConfig.languages || [];
     return (
       <>
@@ -109,6 +111,7 @@ export default function HomePage() {
           <ContactForm
             t={t}
             lang={lang}
+            uid={formUid}
             allowedAppIds={formConfig.apps}
             allowedTypes={formConfig.types}
           />
@@ -119,28 +122,17 @@ export default function HomePage() {
     );
   }
 
-  // Legacy mode: existing ?app=&lang= behavior
-  return (
-    <>
-      {!lockedApp && (
-        <LanguageBar
-          lang={lang}
-          supportedLangs={supportedLangs}
-          langLabels={langLabels}
-          switchLanguage={switchLanguage}
-        />
-      )}
-
+  // Legacy mode: no longer supported without uid — show not found
+  if (formStatus === 'legacy') {
+    return (
       <main className="container">
-        <header className="form-header">
-          <h1>{t('header.title')}</h1>
-          <p>{t('header.subtitle')}</p>
-        </header>
-
-        <ContactForm t={t} lang={lang} lockedApp={lockedApp} />
+        <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{t('status.notfound')}</h1>
+          <p style={{ color: '#8E8E93', fontSize: 15 }}>{t('status.notfoundSub')}</p>
+        </div>
       </main>
+    );
+  }
 
-      <ToastContainer />
-    </>
-  );
+  return null;
 }

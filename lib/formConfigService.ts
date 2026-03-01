@@ -8,15 +8,31 @@ export interface FormConfig {
   status: 'active' | 'paused';
 }
 
-export async function getFormConfig(formId: string): Promise<FormConfig | null> {
-  const snap = await getDoc(doc(db, 'contactForms', formId));
-  if (!snap.exists()) return null;
-  const raw = snap.data() as Record<string, unknown>;
+export interface ResolvedForm {
+  uid: string;
+  config: FormConfig;
+}
+
+export async function resolveForm(formId: string): Promise<ResolvedForm | null> {
+  // 1단계: formIndex에서 uid 조회
+  const indexSnap = await getDoc(doc(db, 'formIndex', formId));
+  if (!indexSnap.exists()) return null;
+
+  const { uid } = indexSnap.data() as { uid: string; status: string };
+  if (!uid) return null;
+
+  // 2단계: /users/{uid}/contactForms/{formId} 읽기
+  const formSnap = await getDoc(doc(db, 'users', uid, 'contactForms', formId));
+  if (!formSnap.exists()) return null;
+
+  const raw = formSnap.data() as Record<string, unknown>;
   // 하위호환: language(string) → languages(string[])
   const languages = Array.isArray(raw.languages)
     ? (raw.languages as string[])
     : typeof raw.language === 'string'
       ? [raw.language as string]
       : [];
-  return { ...(raw as Omit<FormConfig, 'languages'>), languages } as FormConfig;
+  const config = { ...(raw as Omit<FormConfig, 'languages'>), languages } as FormConfig;
+
+  return { uid, config };
 }

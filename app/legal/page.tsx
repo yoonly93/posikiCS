@@ -16,6 +16,7 @@ const MDPreview = dynamic(
 );
 
 interface ParsedRoute {
+  uid: string;
   appId: string;
   docType: string;
   lang: string;
@@ -24,14 +25,14 @@ interface ParsedRoute {
 function parseRoute(): ParsedRoute | null {
   if (typeof window === 'undefined') return null;
   const path = window.location.pathname.replace(/\/+$/, '');
-  // /legal/appId/docType/lang
-  const match = path.match(/^\/legal\/([^/]+)\/([^/]+)\/([^/]+)$/);
+  // /legal/uid/appId/docType/lang
+  const match = path.match(/^\/legal\/([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)$/);
   if (!match) return null;
-  const [, appId, docType, lang] = match;
+  const [, uid, appId, docType, lang] = match;
   const validDoc = DOC_TYPES.some((d) => d.value === docType);
   const validLang = DOC_LANGS.some((l) => l.value === lang);
   if (!validDoc || !validLang) return null;
-  return { appId, docType, lang };
+  return { uid, appId, docType, lang };
 }
 
 export default function LegalPage() {
@@ -62,9 +63,9 @@ export default function LegalPage() {
       setNotFound(false);
 
       const [doc, langs, name] = await Promise.all([
-        getLegalDoc(route.appId, route.docType, route.lang),
-        getPublishedLangs(route.appId, route.docType),
-        getAppName(route.appId),
+        getLegalDoc(route.uid, route.appId, route.docType, route.lang),
+        getPublishedLangs(route.uid, route.appId, route.docType),
+        getAppName(route.uid, route.appId),
       ]);
 
       if (doc && !doc.isDraft) {
@@ -129,7 +130,7 @@ export default function LegalPage() {
 
   function handleLangSwitch(newLang: string) {
     if (!route || newLang === route.lang) return;
-    window.location.href = `/legal/${route.appId}/${route.docType}/${newLang}/`;
+    window.location.href = `/legal/${route.uid}/${route.appId}/${route.docType}/${newLang}/`;
   }
 
   return (

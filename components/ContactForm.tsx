@@ -11,12 +11,13 @@ const ALL_TYPES = ['bug', 'feedback', 'general'] as const;
 interface ContactFormProps {
   t: (key: string) => string;
   lang: string;
+  uid: string;
   lockedApp?: string | null;
   allowedAppIds?: string[] | null;
   allowedTypes?: string[] | null;
 }
 
-export default function ContactForm({ t, lang, lockedApp, allowedAppIds, allowedTypes }: ContactFormProps) {
+export default function ContactForm({ t, lang, uid, lockedApp, allowedAppIds, allowedTypes }: ContactFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [apps, setApps] = useState<AppInfo[]>([]);
@@ -25,7 +26,7 @@ export default function ContactForm({ t, lang, lockedApp, allowedAppIds, allowed
   const honeypotRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    getAppList()
+    getAppList(uid)
       .then((allApps) => {
         if (allowedAppIds && allowedAppIds.length > 0) {
           setApps(allApps.filter((a) => allowedAppIds.includes(a.id)));
@@ -34,7 +35,7 @@ export default function ContactForm({ t, lang, lockedApp, allowedAppIds, allowed
         }
       })
       .finally(() => setAppsLoading(false));
-  }, [allowedAppIds]);
+  }, [uid, allowedAppIds]);
 
   function clearError(field: string) {
     setErrors((prev) => {
@@ -100,6 +101,7 @@ export default function ContactForm({ t, lang, lockedApp, allowedAppIds, allowed
       await Promise.all([
         sendEmail(formData),
         saveContact({
+          uid,
           service: formData.app,
           type: formData.typeValue,
           email: formData.email,
