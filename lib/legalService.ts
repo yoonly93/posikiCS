@@ -18,6 +18,10 @@ export const DOC_LANGS = [
   { value: 'ko', label: '한국어' },
   { value: 'en', label: 'English' },
   { value: 'ja', label: '日本語' },
+  { value: 'zh', label: '中文' },
+  { value: 'fr', label: 'Français' },
+  { value: 'es', label: 'Español' },
+  { value: 'ru', label: 'Русский' },
 ] as const;
 
 export interface LegalDoc {

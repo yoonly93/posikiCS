@@ -64,7 +64,7 @@ export default function HomePage() {
       <main className="container">
         <div style={{ textAlign: 'center', padding: '80px 20px' }}>
           <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{t('status.paused')}</h1>
-          <p style={{ color: '#8E8E93', fontSize: 15 }}>{t('status.pausedSub')}</p>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 15 }}>{t('status.pausedSub')}</p>
         </div>
       </main>
     );
@@ -76,7 +76,7 @@ export default function HomePage() {
       <main className="container">
         <div style={{ textAlign: 'center', padding: '80px 20px' }}>
           <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{t('status.notfound')}</h1>
-          <p style={{ color: '#8E8E93', fontSize: 15 }}>{t('status.notfoundSub')}</p>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 15 }}>{t('status.notfoundSub')}</p>
         </div>
       </main>
     );
@@ -128,7 +128,7 @@ export default function HomePage() {
       <main className="container">
         <div style={{ textAlign: 'center', padding: '80px 20px' }}>
           <h1 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{t('status.notfound')}</h1>
-          <p style={{ color: '#8E8E93', fontSize: 15 }}>{t('status.notfoundSub')}</p>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 15 }}>{t('status.notfoundSub')}</p>
         </div>
       </main>
     );
